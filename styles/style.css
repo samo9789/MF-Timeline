@@ -152,6 +152,18 @@
 	margin-top: 0px;
 }
 
+.timeline .section ol.events li.event .event_container .event_content img {
+        float: left;
+	margin: 0 10px 0 0;
+	width: 80px;
+}
+
+.timeline .section ol.events li.featured .event_container .event_content img {
+        float: none;
+	margin: 0 0 20px 0;
+	width: 200px;
+}
+
 .timeline .section ol.events li.event .event_pointer {
 	background: transparent url(../images/box_pointer.png) no-repeat;
 	display: block;
@@ -217,6 +229,7 @@
 
 .timeline .section ol.events li.event.featured .event_container .event_content {
 	padding: 0px 20px 30px 20px;
+	text-align: center;
 }
 
 .timeline ol.timeline_nav {

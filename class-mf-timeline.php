@@ -148,6 +148,7 @@ class MF_Timeline {
 		
 		/* General Settings */
 		$valid_input['options']['timeline_nav'] = ( $input['options']['timeline_nav'] == 1 ? 1 : 0 );
+		$valid_input['options']['timeline_nav_thumb'] = ( $input['options']['timeline_nav_thumb'] == 1 ? 1 : 0 );
 		$valid_input['db_version'] = $input['db_version'];
 		
 		/* Wordpress */
@@ -352,6 +353,11 @@ class MF_Timeline {
 							<option value="0" <?php selected( '0', $options['options']['timeline_nav'] ); ?>>Hide</option>
 						</select><br/>
 						<span class="description">Appears fixed next to the timeline allowing the user to navigate past events more easily.</span>
+					</li>
+					<li>
+						<label for="mf-timeline-thumbnails"><strong>Images:</strong></label><br />
+						<input type="checkbox" value="1" id="mf-timeline-thumbnails" name="mf_timeline[options][timeline_nav_thumb]"  <?php checked( '1', $options['options']['timeline_nav_thumb'] ); ?> />
+						<label for="mf-timeline-thumbnails">Display feature images for posts</label>
 					</li>
 				</ul>
 			</fieldset>
@@ -672,14 +678,16 @@ class MF_Timeline {
 				$post_types_escape[] = '%s';
 			}
 			
-			$sql = "SELECT {$wpdb->posts}.ID AS id, {$wpdb->posts}.post_title AS title, {$wpdb->posts}.post_content AS content, {$wpdb->posts}.post_excerpt AS excerpt, {$wpdb->posts}.post_date AS date, {$wpdb->posts}.post_author AS author, {$wpdb->terms}.term_id AS term_id
+			$sql = "SELECT {$wpdb->posts}.ID AS id, {$wpdb->posts}.post_title AS title, {$wpdb->posts}.post_content AS content, {$wpdb->posts}.post_excerpt AS excerpt, {$wpdb->posts}.post_date AS date, {$wpdb->posts}.post_author AS author, {$wpdb->terms}.term_id AS term_id, wp_posts2.guid as thumbnail_src
 				FROM `{$wpdb->posts}` 
 				INNER JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id) 
 				INNER JOIN {$wpdb->term_taxonomy} ON ({$wpdb->term_relationships}.term_taxonomy_id = $wpdb->term_taxonomy.term_taxonomy_id)
 				INNER JOIN {$wpdb->terms} ON ({$wpdb->term_taxonomy}.term_id = {$wpdb->terms}.term_id)
+				INNER JOIN {$wpdb->postmeta} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->postmeta}.meta_key = '_thumbnail_id' 
+				INNER JOIN {$wpdb->posts} as wp_posts2 ON wp_posts2.ID = {$wpdb->postmeta}.meta_value
 				WHERE {$wpdb->posts}.post_status = 'publish' 
 				AND {$wpdb->posts}.post_type IN (".implode(',', $post_types_escape).")";
-			
+
 			// Check if we are filtering the post types by hireachrical taxonomy terms
 			if( isset( $options['options']['wp']['filter']['taxonomy'] ) && !empty( $options['options']['wp']['filter']['taxonomy'] ) ) {
 				$term_ids = array_keys( $options['options']['wp']['filter']['taxonomy'] );
@@ -869,6 +877,7 @@ class MF_Timeline {
 	 * @author Matt Fairbrass
 	 **/
 	public function get_timeline() {
+		$options = get_option( 'mf_timeline' );
 		$events = $this->get_timeline_events();
 		$class = null;
 		$html = '<div class="timeline">';
@@ -905,6 +914,12 @@ class MF_Timeline {
 											$html .= '</div>';
 								
 											$html .= '<div class="event_content">';
+												if ($options["options"]["timeline_nav_thumb"]){
+													$html .= '<img src="'.$event["thumbnail_src"].'" />';
+													if ($class == "featured") {
+														$html.= "<br />";
+													}
+												}
 												$html .= apply_filters( 'the_content', $this->format_excerpt( $event['content'], $excerpt_length, $event['excerpt'] ) );
 											$html .= '</div>';
 										$html .= '</div>';
