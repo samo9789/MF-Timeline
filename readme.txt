@@ -16,6 +16,8 @@ In addition to Wordpress content, you can also add content to the timeline from 
 
 You can set timeline events to be "featured", ie: span across both columns to be more prominent by setting a custom meta field key to mf_timeline_featured and its value to 1. This is great for indicating milestones on the timeline, or highlighting a particular piece of information on the timeline.
 
+You can choose for events on the timeline to display the wordpress post featured image. (If you need to add featured image to your past posts automatically, you can use : http://wordpress.org/extend/plugins/auto-post-thumbnail/).
+
 Please report all issues or give feedback on the plugin's [Github repository](https://github.com/matt-d-rat/MF-Timeline "MF Timeline Repository").
 
 == Installation ==
